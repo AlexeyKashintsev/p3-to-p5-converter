@@ -172,41 +172,47 @@ function ConverterUI() {
         string = string.replace(RForm, 'form = P.loadForm(this.constructor.name' + (modules[moduleName].hasModel ? ', model' : '') + ')');
         string = string.replace(RModel, 'P.loadModel(this.constructor.name)');
         
-        var st = string.match(RGenFirst);
-        var sb = string;
-        if (st) {
-            st = st[0].slice(17);
-            string = checkArray(modules[moduleName].formObjects, st, '   form.', moduleName);
-            string = checkArray(modules[moduleName].modelObjects, st, '   model.', moduleName);
-            string = checkArray(modules[moduleName].Objects, st, '   ', moduleName);
-            if (sb == string) {
-                var er = 'Строка не изменена! Модуль: "' + moduleName  + '", Строка ' + st;
+        var matchString = string.match(RGenFirst);
+        if (matchString) {
+            matchString = matchString[0].slice(17);
+            var resStr = matchString;
+            resStr = checkArray(modules[moduleName].formObjects, matchString, '   form.', moduleName);
+            if (resStr == matchString)
+                resStr = checkArray(modules[moduleName].modelObjects, matchString, '   model.', moduleName);
+            if (resStr == matchString)
+                resStr = checkArray(modules[moduleName].Objects, matchString, '   ', moduleName);
+            if (resStr == matchString) {
+                var er = 'Строка не изменена! Модуль: "' + moduleName  + '", Строка ' + matchString;
                 errors.push(er);
                 log(er);
+            } else {
+                string = resStr;
             }
+            
         }
         
-        var st = string.match(RgenLast);
-        if (st) {
-            string = string.slice(0, -st[0].length);
+        matchString = string.match(RgenLast);
+        if (matchString) {
+            string = string.slice(0, -matchString[0].length);
         }
         return string + '\n';
     }
-    function checkArray(anArray, st, prefix, moduleName) {
-        var res = st;
-        anArray.forEach(function(obj) {
-               if (st.match('_' + obj)) {
-                   st = st.slice(obj.length + 1);
-                   var rule = checkRules(st, obj);
-                   if (rule) {
-                       res = prefix + obj + '.' + rule + ' = function(evt) {//p3p5';
-                   } else {
-                       var er = '"' + moduleName  + '", '+ obj + ' ?-> ' + st;
-                       errors.push(er);
-                       log(er);
+    function checkArray(anArray, strObjAct, prefix, moduleName) {
+        var res = strObjAct;
+        if (anArray)
+            anArray.forEach(function(obj) {
+                   if (strObjAct.match('_' + obj)) {
+                       strObjAct = strObjAct.slice(obj.length + 1);
+                       var rule = checkRules(strObjAct, obj);
+                       if (rule) {
+                           res = prefix + obj + '.' + rule + ' = function(evt) {//p3p5';
+                       } else {
+                           var er = '"' + moduleName  + '", '+ obj + ' ?-> ' + strObjAct;
+                           errors.push(er);
+                           log(er);
+                       }
                    }
-               }
-            });
+                });
                 
             return res;
     }
