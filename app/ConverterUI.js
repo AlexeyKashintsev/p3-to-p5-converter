@@ -40,6 +40,7 @@ function ConverterUI() {
     };
     form.btnStart.onActionPerformed = function (event) {
         modules = {};
+        errors = [];
         readFolder(selectedDir);
         log('Чтение файлов завершено. Обработка...');
         log('-------------------------------------');
@@ -170,7 +171,7 @@ function ConverterUI() {
         var RForm  = /form = this/g;
         
         string = string.replace(RForm, 'form = P.loadForm(this.constructor.name' + (modules[moduleName].hasModel ? ', model' : '') + ')');
-        string = string.replace(RModel, 'P.loadModel(this.constructor.name)');
+        string = string.replace(RModel, 'model = P.loadModel(this.constructor.name)');
         
         var matchString = string.match(RGenFirst);
         if (matchString) {
@@ -193,7 +194,7 @@ function ConverterUI() {
         
         matchString = string.match(RgenLast);
         if (matchString) {
-            string = string.slice(0, -matchString[0].length);
+            string = string.slice(0, -matchString[0].length) + ';';
         }
         return string + '\n';
     }
