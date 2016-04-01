@@ -143,10 +143,11 @@ function ConverterUI() {
         
         while (scanner.hasNext()) {
             string = scanner.nextLine();
-            processor(string);
+            processor(string, !scanner.hasNext());
         }
         scanner.close();
     }
+    var firstFunction = true;
     function processJS(aFile, aModuleName) {
         log('---\nОбработка модуля "' + aModuleName + '", файл ' + aFile);
         if (modules[aModuleName].formObjects)
@@ -157,21 +158,43 @@ function ConverterUI() {
         var file = new File(aFile);
         var fw = new FileWriter(file.getAbsoluteFile());
         var bw = new BufferedWriter(fw);
+        firstFunction = true;
         
-        readFile(aFile+'_', function(string) {
-            bw.write(processJSString(string, aModuleName));
+        readFile(aFile+'_', function(string, lastString) {
+            bw.write(processJSString(string, aModuleName, lastString));
         });
         
         bw.close();
     };
-    function processJSString(string, moduleName) {
+    function processJSString(string, moduleName, lastString) {
         var RGenFirst = /\/\/GEN-FIRST:event_+(\w+)/g;
         var RgenLast = /\/\/GEN-LAST:event_+(\w*)/g;
         var RModel = /model = this.model/g;
         var RForm  = /form = this/g;
+        var RFunctionConstructor = /function \w*\(/g;
         
-        string = string.replace(RForm, 'form = P.loadForm(this.constructor.name' + (modules[moduleName].hasModel ? ', model' : '') + ')');
-        string = string.replace(RModel, 'model = P.loadModel(this.constructor.name)');
+        var RModuleConstructor = new RegExp('function ' + moduleName + '() {', 'g');
+        
+        if (form.cbAMD.selected) {
+            if (firstFunction && RFunctionConstructor.test(string)) {
+                RFunctionConstructor = /function \w*\(/g;
+                firstFunction = false;
+                var mName = RFunctionConstructor.exec(string)[0].replace("function ", '').replace('(', '');;
+                var FL = form.cbCustomFormLoader.selected ? "FormLoader" : "Forms";
+                string = "define('" + mName + "', ['orm', '" + FL + "'], function(Orm, " + FL + ", ModuleName) {\n\
+        function module_constructor() {";
+            }
+            string = string.replace(RForm, form.cbCustomFormLoader.selected ? 
+                                      'form = FormLoader(ModuleName' + (modules[moduleName].hasModel ? ', model' : 'null') + ', self)' 
+                                    : 'form = Forms.loadForm(ModuleName' + (modules[moduleName].hasModel ? ', model' : '') + ')');
+            string = string.replace(RModel, 'model = Orm.loadModel(ModuleName)');
+            if (lastString) {
+                string = "      }\n return module_constructor;\n});"
+            }
+        } else {
+            string = string.replace(RForm, 'form = P.loadForm(this.constructor.name' + (modules[moduleName].hasModel ? ', model' : '') + ')');
+            string = string.replace(RModel, 'model = P.loadModel(this.constructor.name)');
+        }
         
         var matchString = string.match(RGenFirst);
         if (matchString) {
@@ -221,7 +244,13 @@ function ConverterUI() {
         var rules = {
             ActionPerformed:    'onActionPerformed',
             MouseClicked:       'onMouseClicked',
-            OnRequeried:        'onRequeried'
+            OnRequeried:        'onRequeried',
+            OnSelect:           'onSelect',
+            SelectValue:        'onSelect',
+            FocusLost:          'onFocusLost',
+            KeyPressed:         'onKeyPressed',
+            KeyReleased:        'onKeyReleased',
+            KeyTyped:           'onKeyTyped'
         };
         
         var res = rules[anActionName];
