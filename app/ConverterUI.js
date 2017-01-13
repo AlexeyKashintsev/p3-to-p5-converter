@@ -245,6 +245,7 @@ function ConverterUI() {
             ActionPerformed:    'onActionPerformed',
             MouseClicked:       'onMouseClicked',
             OnRequeried:        'onRequeried',
+            OnScrolled:         'onScrolled',
             OnSelect:           'onSelect',
             SelectValue:        'onSelect',
             FocusLost:          'onFocusLost',

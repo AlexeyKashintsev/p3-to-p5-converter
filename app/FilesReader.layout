@@ -19,10 +19,7 @@
     <AnchorsPaneConstraints bottom="10px" left="10px" right="12px" top="110px"/>
   </ScrollPane>
   <TextArea cursor="0" name="taLog" parent="scrollPane" prefHeight="247px" prefWidth="478px"/>
-  <CheckBox cursor="0" name="cbAMD" parent="view" prefHeight="30px" prefWidth="120px" text="AMD загрузчик">
-    <AnchorsPaneConstraints height="30px" left="80px" top="70px" width="120px"/>
-  </CheckBox>
-  <CheckBox cursor="0" name="cbCustomFormLoader" parent="view" prefHeight="30px" prefWidth="190px" text="Специфичный загрузчик форм">
-    <AnchorsPaneConstraints height="30px" left="200px" top="70px" width="190px"/>
-  </CheckBox>
+  <Button cursor="0" name="button" parent="view" prefHeight="30px" prefWidth="100px" text="button">
+    <AnchorsPaneConstraints height="30px" left="290px" top="50px" width="100px"/>
+  </Button>
 </layout>

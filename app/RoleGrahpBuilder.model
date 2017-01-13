@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><datamodel>
+  <entity Name="qRoles" Title="" entityHeight="200" entityIconified="false" entityId="148423809839400" entityLocationX="121" entityLocationY="85" entityWidth="150" queryId="qRoles" tableName="" tableSchemaName=""/>
+  <entity Name="qRolesDependencies" Title="" entityHeight="200" entityIconified="false" entityId="148423809947700" entityLocationX="422" entityLocationY="112" entityWidth="150" queryId="qRolesDependencies" tableName="" tableSchemaName=""/>
+  <referenceRelation leftEntityFieldName="child_rule" leftEntityId="148423809947700" rightEntityFieldName="rule_name" rightEntityId="148423809839400"/>
+  <referenceRelation leftEntityFieldName="parent_rule" leftEntityId="148423809947700" rightEntityFieldName="rule_name" rightEntityId="148423809839400"/>
+</datamodel>
