@@ -7,13 +7,7 @@ define('RoleGrahpBuilder', ['orm', 'logger'], function (Orm, Logger, ModuleName)
         var self = this, model = Orm.loadModel(ModuleName);
 
         var moduleEntities = /entity Name="+(\w+)+"/g;
-        var queryTables =  /tableName="+(\w+)+"/g;
-        var Rquotes = /"+(\w+)+"/g;
         var Rroles = /[\s\S]*rolesAllowed\S*\s*/g;
-        var RrolesR = /[\s\S]*rolesAllowedRead\S*\s*/g;
-        var RrolesW = /[\s\S]*rolesAllowedWrite\S*\s*/g;
-        var RonlFlag = /@readonly/g;
-        var WritableFlag = /@writable/g;
 
         var entities = {}, errors = [];
 
@@ -71,50 +65,7 @@ define('RoleGrahpBuilder', ['orm', 'logger'], function (Orm, Logger, ModuleName)
                     reader.log('Обнаружено таблиц: ' + entities[aModuleName].tables.length);
             });
         }
-        function processSQL(aFile, aMN) {
-            checkModule(aMN);
-            entities[aMN].type = 'QUERY';
-            reader.log('Получение ролей для запроса "' + aMN + '"');
-
-            reader.readFile(aFile, function (string) {
-                var matchString = string.match(RrolesR);
-                if (matchString) {
-                    var ar = string.slice(matchString[0].length, string.length);
-                    ar = ar.split(/[,\s]+/g);
-                    if (!entities[aMN].rolesAllowedToRead)
-                        entities[aMN].rolesAllowedToRead = [];
-                    ar.forEach(function (role) {
-                        entities[aMN].rolesAllowedToRead.push(role);
-                    });
-                }
-                var matchString = string.match(RrolesW);
-                if (matchString) {
-                    var ar = string.slice(matchString[0].length, string.length);
-                    ar = ar.split(/[,\s]+/g);
-                    if (!entities[aMN].rolesAllowedToWrite)
-                        entities[aMN].rolesAllowedToWrite = [];
-                    ar.forEach(function (role) {
-                        entities[aMN].rolesAllowedToWrite.push(role);
-                    });
-                }
-                var matchString = string.match(WritableFlag);
-                if (matchString) {
-                    var ar = string.slice(matchString[0].length, string.length);
-                    ar = ar.split(/[,\s]+/g);
-                    if (!entities[aMN].writable)
-                        entities[aMN].writable = [];
-                    ar.forEach(function (tables) {
-                        entities[aMN].writable.push(tables);
-                    });
-                };
-                var matchString = string.match(RonlFlag);
-                if (matchString) {
-                     entities[aMN].readOnly = true;
-                };
-                processString(string, aMN);
-            });
-            
-        }
+        
         function processJS(aFile, aModuleName) {
             checkModule(aModuleName);
             reader.log('---\nОбработка модуля "' + aModuleName + '", файл ' + aFile);

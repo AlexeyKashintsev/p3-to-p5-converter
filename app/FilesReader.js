@@ -47,11 +47,9 @@ function FilesReader() {
             processor.onEnd();
 
             errors.forEach(log);            
-        })
+        });
     };
-    form.button.onActionPerformed = function(evt) {
-        
-    };
+    
     function log(aLogMessage) {
         P.invokeLater(function() {
             form.taLog.text += aLogMessage + '\n';

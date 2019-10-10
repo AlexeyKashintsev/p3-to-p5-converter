@@ -19,7 +19,4 @@
     <AnchorsPaneConstraints bottom="10px" left="10px" right="12px" top="110px"/>
   </ScrollPane>
   <TextArea cursor="0" name="taLog" parent="scrollPane" prefHeight="247px" prefWidth="478px"/>
-  <Button cursor="0" name="button" parent="view" prefHeight="30px" prefWidth="100px" text="button">
-    <AnchorsPaneConstraints height="30px" left="290px" top="50px" width="100px"/>
-  </Button>
 </layout>
