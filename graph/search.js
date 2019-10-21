@@ -1,17 +1,17 @@
-var path = require('path');
-var fs = require('fs');
-var async = require('async');
-import {ModuleProcessor} from "./modules";
+const path = require('path');
+const fs = require('fs');
+const async = require('async');
+const ModuleProcessor = require('./modules');
 
 function getFiles(dirPath, callback) {
-	var ignore = ['node_modules'];
+	let ignore = ['node_modules'];
 	fs.readdir(dirPath, function (err, files) {
 		if (err) return callback(err);
 
-		var filePaths = [];
-		var modules = new ModuleProcessor();
+		let filePaths = [];
+		let modules = new ModuleProcessor();
 		async.eachSeries(files, function (fileName, eachCallback) {
-			var filePath = path.join(dirPath, fileName);
+			let filePath = path.join(dirPath, fileName);
 			//let a = fileName.split('.');
 			//console.log(a[0]);
 
@@ -45,6 +45,7 @@ function getFiles(dirPath, callback) {
 	});
 
 }
+
 
 getFiles('./', function (err, files) {
 
