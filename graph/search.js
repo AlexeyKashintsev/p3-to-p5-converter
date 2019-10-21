@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const async = require('async');
+const splt = require('split');
 const ModuleProcessor = require('./modules');
 
 function getFiles(dirPath, callback) {
@@ -12,6 +13,7 @@ function getFiles(dirPath, callback) {
 		let modules = new ModuleProcessor();
 		async.eachSeries(files, function (fileName, eachCallback) {
 			let filePath = path.join(dirPath, fileName);
+			let modName = 'nothing';
 			//let a = fileName.split('.');
 			//console.log(a[0]);
 
@@ -28,10 +30,22 @@ function getFiles(dirPath, callback) {
 
 				} else {
 					if (stat.isFile() && (/\.js$/.test(filePath)
-						|| /\.sql$/.test(filePath))
-						|| /\.model$/.test(filePath)) {
-						modules.process(filePath, fileName);
-						// filePaths.push(fileName);
+						|| /\.sql$/.test(filePath)
+						|| /\.model$/.test(filePath))) {
+						filePaths.push(fileName);
+						fs.createReadStream(filePath)
+							.pipe(splt())
+							.on('data', function (line) {
+								var nameString = line.match(/[\s\S]*@name\S*\s*/g);
+								if (nameString) {
+									modName = line.slice(nameString[0].length, line.length);
+								}
+								//fs.appendFileSync('./log.txt', fileName+' '+nameString+'\n');
+								//each chunk now is a separate line!
+						});
+						modules.process(filePath, fileName, modName);
+
+
 						//console.log(filePaths);
 					}
 
@@ -45,9 +59,9 @@ function getFiles(dirPath, callback) {
 	});
 
 }
+//E:\arm-master
 
-
-getFiles('./', function (err, files) {
+getFiles('E:\\p3-to-p5-converter\\graph', function (err, files) {
 
 	//console.log(err || files);
 });
