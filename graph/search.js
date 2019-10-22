@@ -6,6 +6,7 @@ const ModuleProcessor = require('./modules');
 
 function getFiles(dirPath, callback) {
 	let ignore = ['node_modules'];
+	let res;
 	fs.readdir(dirPath, function (err, files) {
 		if (err) return callback(err);
 
@@ -33,16 +34,29 @@ function getFiles(dirPath, callback) {
 						|| /\.sql$/.test(filePath)
 						|| /\.model$/.test(filePath))) {
 						filePaths.push(fileName);
-						fs.createReadStream(filePath)
-							.pipe(splt())
-							.on('data', function (line) {
-								var nameString = line.match(/[\s\S]*@name\S*\s*/g);
-								if (nameString) {
-									modName = line.slice(nameString[0].length, line.length);
-								}
-								//fs.appendFileSync('./log.txt', fileName+' '+nameString+'\n');
-								//each chunk now is a separate line!
-						});
+						if (/\.model$/.test(filePath)) {
+							fs.createReadStream(filePath)
+								.pipe(splt())
+								.on('data', function (line) {
+									// let nameString = line.toLowerCase().indexOf("entity name=".toLowerCase());
+									// nameString+=12;
+									// let regexp = /"(.*?)"/;
+									let Rmod = /tableName="+(\w+)+"/;
+									let Rquotes = /"+(\w+)+"/;
+									// let nameString = line.match(Rmod).match(Rquotes).slice(1, -1);
+									let nameString = line.match(Rmod);
+									// nameString = nameString.match(Rquotes);
+									// if (nameString !== "null"){
+										res = nameString.split(',');
+									// }
+									if (res) {
+										// modName = line.slice(nameString[0].length, line.length);
+										fs.appendFileSync('./log.txt', fileName + '     ' + res[1] + '\n');
+
+									}
+									//each chunk now is a separate line!
+								});
+						}
 						modules.process(filePath, fileName, modName);
 
 
@@ -61,7 +75,7 @@ function getFiles(dirPath, callback) {
 }
 //E:\arm-master
 
-getFiles('E:\\p3-to-p5-converter\\graph', function (err, files) {
+getFiles('E:\\p3-to-p5-converter\\app', function (err, files) {
 
 	//console.log(err || files);
 });
