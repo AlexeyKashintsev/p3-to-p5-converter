@@ -12,23 +12,29 @@ function FilesReader() {
         form.show();
     };
     var FileChooser = Java.type('javax.swing.JFileChooser'),
-        Files = Java.type('java.nio.file.Files'),
-        Paths = Java.type('java.nio.file.Paths'),
-        File = Java.type('java.io.File'),
-        FIS = Java.type('java.io.FileInputStream'),
-        SCN = Java.type('java.util.Scanner'),
-        FileWriter = Java.type('java.io.FileWriter'),
-        BufferedWriter = Java.type('java.io.BufferedWriter');
+            Files = Java.type('java.nio.file.Files'),
+            Paths = Java.type('java.nio.file.Paths'),
+            File = Java.type('java.io.File'),
+            FIS = Java.type('java.io.FileInputStream'),
+            SCN = Java.type('java.util.Scanner'),
+            FileWriter = Java.type('java.io.FileWriter'),
+            BufferedWriter = Java.type('java.io.BufferedWriter');
 
     var
-        selectedDir = '',
-        errors = [],
-        processor;
+            selectedDir = '',
+            errors = [],
+            processor;
 
 
-    P.require(['RoleGrahpBuilder', 'SQLFilesAnalyser'], function(RoleGrahpBuilder, SQLFilesAnalyser) {
-        processor = new RoleGrahpBuilder(self);
+    P.require(['FilesAnalyser'], function (Processor) {
+        processor = new Processor(self);
     });
+    
+    (function () {
+        var file = new File('c:\\dev\\transcard\\arm\\app\\');
+        selectedDir = file;
+        form.teFolder.text = selectedDir;
+    })();
 
     form.btnChooseFolder.onActionPerformed = function (event) {
         var chooser = new FileChooser();
@@ -37,92 +43,103 @@ function FilesReader() {
         if (result == FileChooser.APPROVE_OPTION) {
             selectedDir = chooser.getSelectedFile();
             form.teFolder.text = selectedDir;
-        };
+        }
     };
+    
     form.btnStart.onActionPerformed = function (event) {
         processor.onStart();
-        P.invokeLater(function() {
+        P.invokeLater(function () {
             self.readFolder(selectedDir);
             log('Чтение файлов завершено.');
             processor.onEnd();
 
-            errors.forEach(log);            
+            errors.forEach(log);
         });
     };
-    
+
     function log(aLogMessage) {
-        P.invokeLater(function() {
+        P.invokeLater(function () {
             form.taLog.text += aLogMessage + '\n';
         });
 //        P.Logger.severe(aLogMessage);
     }
     function parseFilename(aFileName) {
         var a = aFileName.split(".");
-        if( a.length === 1 || ( a[0] === "" && a.length === 2 ) ) {
+        if (a.length === 1 || (a[0] === "" && a.length === 2)) {
             var ext = "";
         }
         ext = a.pop();
         return {extension: ext, moduleName: a.join('.')};
     }
-    var foldersToSkip = ['Server', 'Сервер', 'modules', 'widgets', 'icons', 'Модели',];
+
+    var foldersToSkip = ['Server', 'Сервер', 'common', 'modules', 'widgets', 'tests','icons', 'Модели', 'WEB-INF', 'Billing'];
     function readFolder(aFolder) {
         var skip = false;
-        foldersToSkip.forEach(function(fts) {
-            if (!!aFolder.path&&aFolder.path.match(fts) || aFolder.match && aFolder.match(fts)) {
+        foldersToSkip.forEach(function (fts) {
+            if (!!aFolder.path && aFolder.path.match(fts) || aFolder.match && aFolder.match(fts)) {
                 skip = true;
                 log('Папка ' + fts + ' - пропуск');
             }
         });
-        
+
         if (!skip) {
             var files = new File(aFolder).list();
             log('Чтение папки: ' + aFolder + ', Всего файлов в папке: ' + files.length);
             for (var j in files) {
                 var file = files[j];
                 var fData = parseFilename(file);
-                file = aFolder + "\\" + file;
-                var f = new File(file);
+                var filePath = aFolder + "/" + file;
+                var f = new File(filePath);
                 if (f.isDirectory()) {
                     if (form.cbSubfolders.selected)
-                        readFolder(file);
-                } else 
-                    processor.processFile(file, fData);
-                        
+                        readFolder(filePath);
+                } else
+                    processor.processFile(filePath, fData);
+
             }
         }
     }
+
     function readFile(aFile, processor) {
         var fis = new FIS(aFile);
         var scanner = new SCN(fis, "UTF-8");
         var string, iter = 0;
 
-        while (scanner.hasNext() && iter < 15) {
+        while (scanner.hasNext()) {
             iter++;
             string = scanner.nextLine();
-            processor(string, !scanner.hasNext());
+            try {
+                processor(string, !scanner.hasNext());
+            } catch (e) {
+                log("!!!!!!!!Ошибка!!!!! Файл: " + aFile 
+                        + "\n Строка " + iter + ": " + string
+                        + "\n" + e);
+            }
         }
         scanner.close();
     }
+
     function copyFile(anOldFile, aNewFile) {
         try {
             Files.copy(Paths.get(anOldFile), Paths.get(aNewFile));
-        } catch(e) {}
+        } catch (e) {
+        }
     }
-    
+
     function getWritable(aFileName) {
         var file = new File(aFileName);
         var fw = new FileWriter(file.getAbsoluteFile());
         var bw = new BufferedWriter(fw);
-        
-        this.write = function(string2write) {
+
+        this.write = function (string2write) {
             bw.write(string2write);
         };
-        
-        this.close = function() {
+
+        this.close = function () {
             bw.close();
         };
     }
-    
+
     self.log = log;
     self.readFolder = readFolder;
     self.readFile = readFile;

@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?><layout title="" view="view">
-  <AnchorsPane background="#ffffff" cursor="0" name="view" prefHeight="369px" prefWidth="502px"/>
+  <AnchorsPane background="#ffffff" cursor="0" name="view" prefHeight="369px" prefWidth="869px"/>
   <Label cursor="0" name="label" parent="view" prefHeight="30px" prefWidth="70px" text="Каталог">
     <AnchorsPaneConstraints height="30px" left="10px" top="10px" width="70px"/>
   </Label>
-  <TextField cursor="0" name="teFolder" parent="view" prefHeight="30px" prefWidth="310px" text="textField">
+  <TextField cursor="0" name="teFolder" parent="view" prefHeight="30px" prefWidth="677px" text="textField">
     <AnchorsPaneConstraints height="30px" left="80px" right="112px" top="10px"/>
   </TextField>
   <Button cursor="0" name="btnChooseFolder" parent="view" prefHeight="30px" prefWidth="92px" text="Выбрать">
     <AnchorsPaneConstraints height="30px" right="10px" top="10px" width="92px"/>
   </Button>
-  <CheckBox cursor="0" name="cbSubfolders" parent="view" prefHeight="30px" prefWidth="120px" text="Включая подкаталоги">
+  <CheckBox cursor="0" name="cbSubfolders" parent="view" prefHeight="30px" prefWidth="120px" selected="true" text="Включая подкаталоги">
     <AnchorsPaneConstraints height="30px" left="80px" top="40px" width="120px"/>
   </CheckBox>
   <Button cursor="0" name="btnStart" parent="view" prefHeight="30px" prefWidth="90px" text="Начать">
     <AnchorsPaneConstraints height="30px" right="12px" top="50px" width="90px"/>
   </Button>
-  <ScrollPane cursor="0" name="scrollPane" parent="view" prefHeight="249px" prefWidth="480px">
+  <ScrollPane cursor="0" name="scrollPane" parent="view" prefHeight="249px" prefWidth="847px">
     <AnchorsPaneConstraints bottom="10px" left="10px" right="12px" top="110px"/>
   </ScrollPane>
-  <TextArea cursor="0" name="taLog" parent="scrollPane" prefHeight="247px" prefWidth="478px"/>
+  <TextArea cursor="0" name="taLog" parent="scrollPane" prefHeight="247px" prefWidth="845px"/>
 </layout>
